@@ -7,6 +7,7 @@
   "author": "Harshit Kumar <harshitkumar9030@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "fluent-ffmpeg": "^2.1.3",
     "mongoose": "^8.4.4",
