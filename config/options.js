@@ -1,8 +1,8 @@
 const fs = require("fs");
 
 const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/server.hogwart.tech/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/server.hogwart.tech/fullchain.pem'),
+  key: fs.readFileSync('C:/Users/kei/Downloads/privkey.pem'),
+  cert: fs.readFileSync('C:/Users/kei/Downloads/fullchain.pem'),
 };
 
 module.exports = { options };
