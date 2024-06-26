@@ -1,0 +1,15 @@
+{
+  "name": "clustered_server",
+  "version": "1.0.0",
+  "description": "Server for ytdl (clustered)",
+  "main": "server.js",
+  "repository": "https://github.com/HarshitKumar9030/clustered_server.git",
+  "author": "Harshit Kumar <harshitkumar9030@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "mongoose": "^8.4.4",
+    "ytdl-core": "^4.11.5"
+  }
+}

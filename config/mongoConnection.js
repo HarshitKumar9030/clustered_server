@@ -1,15 +1,18 @@
+// config/mongoConnection.js
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://192.168.1.101:27017,192.168.1.102:27017/ytdl-server", {
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      replicaSet: "rs0"
     });
-    console.log("MongoDB connected");
+    console.log("MongoDB connected successfully");
   } catch (err) {
-    console.error("MongoDB connection error:", err);
+    console.error("MongoDB connection error:", err.message);
     process.exit(1);
   }
 };
