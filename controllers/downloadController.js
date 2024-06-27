@@ -80,7 +80,7 @@ const downloadVideo = async (req, res) => {
       } else {
         ffmpeg(stream)
           .audioCodec("libmp3lame")
-          .audioBitrate(quality === "highest" ? 320 : 128) // Adjusting quality for MP3
+          .audioBitrate(quality === "highest" ? 320 : 128) 
           .format("mp3")
           .on("error", (err) => {
             console.error("Error processing video:", err);

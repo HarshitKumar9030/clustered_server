@@ -4,9 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const { options } = require("./config/options");
 const { connectDB } = require("./config/mongoConnection");
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 
 // Connect to MongoDB
 connectDB();
@@ -20,6 +22,22 @@ const trendsRoutes = require("./routes/trends");
 app.use("/api/download", downloadRoutes);
 app.use("/api/formats", formatsRoutes);
 app.use("/api/trends", trendsRoutes);
+
+
+//Cors
+
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://hogwart.tech",
+  ], 
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
