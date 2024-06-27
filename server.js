@@ -13,19 +13,6 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
 
-// Load routes
-const downloadRoutes = require("./routes/download");
-const formatsRoutes = require("./routes/formats");
-const trendsRoutes = require("./routes/trends");
-
-// Use routes
-app.use("/api/download", downloadRoutes);
-app.use("/api/formats", formatsRoutes);
-app.use("/api/trends", trendsRoutes);
-
-
-//Cors
-
 const corsOptions = {
   origin: [
     "http://localhost:3000",
@@ -38,6 +25,17 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Load routes
+const downloadRoutes = require("./routes/download");
+const formatsRoutes = require("./routes/formats");
+const trendsRoutes = require("./routes/trends");
+
+// Use routes
+app.use("/api/download", downloadRoutes);
+app.use("/api/formats", formatsRoutes);
+app.use("/api/trends", trendsRoutes);
+
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
