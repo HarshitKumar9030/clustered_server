@@ -1,9 +1,12 @@
+// controllers/downloadController.js
 const ytdl = require("ytdl-core");
 const ffmpeg = require("fluent-ffmpeg");
 const { formatExtensions, stopWords } = require("../utils/constants");
 const { TrendingWord } = require("../models/TrendingWord");
 const { DownloadLog } = require("../models/DownloadLog");
-const stram = require('stream');
+const { PassThrough } = require('stream');
+const { storeVideo, serveVideo, findVideo, server1Path, server2Path } = require('../utils/videoUtils');
+const Video = require('../models/Video'); // Assuming Video is a Mongoose model
 
 const downloadVideo = async (req, res) => {
   const videoURL = req.query.url;
@@ -17,6 +20,7 @@ const downloadVideo = async (req, res) => {
   try {
     const info = await ytdl.getInfo(videoURL);
     const title = info.videoDetails.title.replace(/[\/\\?%*:|"<>]/g, ""); // Sanitize title
+    const videoId = info.videoDetails.videoId;
     const videoFormats = ytdl.filterFormats(info.formats, "video");
     const audioFormat = ytdl.filterFormats(info.formats, "audioonly")[0];
 
@@ -42,11 +46,19 @@ const downloadVideo = async (req, res) => {
       `attachment; filename="${sanitizedTitle}.${fileExtension}"`
     );
 
-    const stream = ytdl.downloadFromInfo(info, { format: chosenFormat });
-    const passThrough = new stram.PassThrough();
+    const existingVideoPath = findVideo(videoId, format);
+
+    if (existingVideoPath) {
+      return serveVideo(existingVideoPath, res);
+    }
+
+    const videoStream = ytdl.downloadFromInfo(info, { format: chosenFormat });
+    const passThrough = new PassThrough();
+
+    let filePath;
 
     if (format === "wav") {
-      ffmpeg(stream)
+      ffmpeg(videoStream)
         .audioCodec("pcm_s16le")
         .format("wav")
         .on("error", (err) => {
@@ -57,8 +69,11 @@ const downloadVideo = async (req, res) => {
         })
         .pipe(passThrough)
         .pipe(res, { end: true });
+
+      filePath = await storeVideo(passThrough, videoId, 'wav', server1Path);
+      await Video.create({ videoId, format: 'wav', filePath });
     } else if (format === "flac") {
-      ffmpeg(stream)
+      ffmpeg(videoStream)
         .audioCodec("flac")
         .format("flac")
         .on("error", (err) => {
@@ -69,8 +84,11 @@ const downloadVideo = async (req, res) => {
         })
         .pipe(passThrough)
         .pipe(res, { end: true });
+
+      filePath = await storeVideo(passThrough, videoId, 'flac', server1Path);
+      await Video.create({ videoId, format: 'flac', filePath });
     } else if (format === "mp4" || format === "webm") {
-      ffmpeg(stream)
+      ffmpeg(videoStream)
         .videoCodec("copy")
         .format(format)
         .on("error", (err) => {
@@ -81,8 +99,11 @@ const downloadVideo = async (req, res) => {
         })
         .pipe(passThrough)
         .pipe(res, { end: true });
+
+      filePath = await storeVideo(passThrough, videoId, format, server1Path);
+      await Video.create({ videoId, format, filePath });
     } else {
-      ffmpeg(stream)
+      ffmpeg(videoStream)
         .audioCodec("libmp3lame")
         .audioBitrate(quality === "highest" ? 320 : 128)
         .format("mp3")
@@ -94,6 +115,9 @@ const downloadVideo = async (req, res) => {
         })
         .pipe(passThrough)
         .pipe(res, { end: true });
+
+      filePath = await storeVideo(passThrough, videoId, 'mp3', server1Path);
+      await Video.create({ videoId, format: 'mp3', filePath });
     }
 
     // Record the video title for trending topics

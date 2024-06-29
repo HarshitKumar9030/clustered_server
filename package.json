@@ -7,6 +7,7 @@
   "author": "Harshit Kumar <harshitkumar9030@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "child_process": "^1.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
